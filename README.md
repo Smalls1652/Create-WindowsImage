@@ -1,21 +1,21 @@
-#Automate the building of images with New-WindowsImage.
+# Automate the building of images with New-WindowsImage.
 
 The development of this script was because of the lack of funding for SCCM licensing and no WDS/MDT infrastructure. You should be able to utilize the WIM files generated from this to use in a WDS/MDT setup, but it has not been tested yet. I personally store the WIM files on a network share and utilize WinPE to deploy an image and then clone that drive, but that's a temporary setup until I can get WDS/MDT set up.
 
-##Prereqs
+## Prereqs
 
 - A computer/server that supports virtualization. **(Pretty much any modern hardware will support it)**
 - Hyper-V enabled. **(Please note that any other hypervisors will not work when Hyper-V is enabled)**
 - Powershell 5.1 **(May potentially work on older and newer versions, but I've only tested it on Windows 10 with PS 5.1)**
  
-##Recommended
+## Recommended
 
 *These are not required, but recommended if you want to make things smoother.*
 
 - PSWindowsUpdate (https://www.powershellgallery.com/packages/PSWindowsUpdate/1.5.2.2)
 - Drivers for specific computer architectures. (I use pnputility to grab drivers from machines. See down below for more info.)
 
-##Set up the environment
+## Set up the environment
 
 **Note: This has been tested and built for Windows 10 deployments, but in theory it should work for 7/8 as well.**
 
@@ -26,7 +26,7 @@ The development of this script was because of the lack of funding for SCCM licen
 5. Once it gets to the desktop (A sysprep window should be open when you get to the desktop), create a snapshot called "Base Start".
 6. Either shut down the VM or leave it running.
 
-###Software Repo and Config Files
+### Software Repo and Config Files
 
 To automate the entire process, I'd suggest you create these files. Inside of *SoftwareRepo.ps1* and the *Base.ps1* files are generic examples and HowTos on how to build them out. Config files are necessary for the script to work at this time.
 
@@ -36,7 +36,7 @@ The *Base.ps1* file is just an example, but it can be used. General guidelines f
 
 This setup should help leverage a lot of modularity into what you want to build an image for. It's easy to customize and automate.
 
-##Usage
+## Usage
 
 Once you're done building the environment, you can now start making images. Here's how to get it all ready:
 
@@ -55,7 +55,7 @@ Here are two examples of how to use it:
 2. Create an image with a specific architecure and an answer file for sysprep:
 `New-WindowsImage -VMName "Win10" -ConfigFile "Base" -Name "Employees" -Arch "Optiplex3040" -SysprepFile ".\win10.xml"`
 
-##Getting driver packages with pnputil
+## Getting driver packages with pnputil
 
 This is usually how I get drivers for a specific architecures:
 
@@ -66,6 +66,6 @@ This is usually how I get drivers for a specific architecures:
 4. Copy the "C:\archname" folder to a flash drive or network share.
 5. Move/copy the folder (Not the files, the folder itself) to the .\files\Drivers directory in your environment.
 
-##Notes
+## Notes
 
 This is a growing script and I hope to just turn it into a full blown module at some point, but I will take any issues, suggestions, etc. I can get. Even if you think my documentation for installation and whatnot is bad, please let me know what I need to change or if something doesn't make sense. I will work with you and change it as best as I can. This went from being a thrown together script to automate my image building into a fully modularized setup that anyone could potentially use. It isn't perfect, but I hope it helps anybody out there.
