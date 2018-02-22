@@ -43,6 +43,7 @@ Once you're done building the environment, you can now start making images. Here
 1. Launch Powershell (As an Administrator).
 2. Change your current directory to the root of your environment.
 3. Run the following code (You may have to modify your execution policy):
+
 `Import-Module .\New-WindowsImage.ps1`
 
 From here, you will be able to run the *New-WindowsImage* command. If you need help with the parameters, type in `Get-Help -Full New-WindowsImage`.
@@ -50,9 +51,11 @@ From here, you will be able to run the *New-WindowsImage* command. If you need h
 Here are two examples of how to use it:
 
 1. Create an image with no specific architecure in mind:
+
 `New-WindowsImage -VMName "Win10" -ConfigFile "Base" -Name "MaintenanceImage"`
 
 2. Create an image with a specific architecure and an answer file for sysprep:
+
 `New-WindowsImage -VMName "Win10" -ConfigFile "Base" -Name "Employees" -Arch "Optiplex3040" -SysprepFile ".\win10.xml"`
 
 ## Getting driver packages with pnputil
@@ -62,7 +65,9 @@ This is usually how I get drivers for a specific architecures:
 1. Install Windows 10 onto the source machine.
 2. Install all drivers needed from Windows Update and/or the manufacturer's support page.
 3. Run the following command (Replacing archname with the name you want to designate the architecture as):
+
 `pnputil /export-driver * c:\archname`
+
 4. Copy the "C:\archname" folder to a flash drive or network share.
 5. Move/copy the folder (Not the files, the folder itself) to the .\files\Drivers directory in your environment.
 
