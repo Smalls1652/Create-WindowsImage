@@ -1,4 +1,4 @@
-#Automate the building of images with New-WindowsImage.
+#Automate the building of images with New-WindowsImage.#
 The development of this script was because of the lack of funding for SCCM licensing and no WDS/MDT infrastructure. You should be able to utilize the WIM files generated from this to use in a WDS/MDT setup, but it has not been tested yet. I personally store the WIM files on a network share and utilize WinPE to deploy an image and then clone that drive, but that's a temporary setup until I can get WDS/MDT set up.
 
 ##Prereqs##
