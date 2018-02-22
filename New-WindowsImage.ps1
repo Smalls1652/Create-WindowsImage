@@ -42,7 +42,7 @@ function New-WindowsImage {
 
         Copy-Item -ToSession $vmSession -Path ".\PSWindowsUpdate" -Destination "C:\Users\Administrator\Desktop\PSWindowsUpdate" -Recurse
 
-        Copy-Item -ToSession $vmSession -Path $SysprepFile -Destination "C:\$($SysprepFile)"
+        Copy-Item -ToSession $vmSession -Path $SysprepFile -Destination "C:\answer.xml"
     }
 
     function installDrivers {
@@ -70,13 +70,13 @@ function New-WindowsImage {
     function sysprepVM {
         if ($SysprepFile) {
             Invoke-Command -VMName $VMName -Credential $creds -ScriptBlock { 
-                New-ItemProperty -Path "HKCU:\Software\Microsoft\Windows\CurrentVersion\Run" -Name "Sysprep" -PropertyType "ExpandString" -Value "cmd.exe /C taskkill /IM sysprep.exe && timeout /t 5 && ""C:\Windows\system32\sysprep\sysprep.exe"" /generalize /oobe /shutdown /unattend:C:\$($SysprepFile)"
+                New-ItemProperty -Path "HKCU:\Software\Microsoft\Windows\CurrentVersion\Run" -Name "Sysprep" -PropertyType "ExpandString" -Value "cmd.exe /C taskkill /IM sysprep.exe && timeout /t 5 && ""C:\Windows\system32\sysprep\sysprep.exe"" /generalize /oobe /shutdown /unattend:C:\answer.xml"
                 Restart-Computer -Force
             }
         }
         else {
             Invoke-Command -VMName $VMName -Credential $creds -ScriptBlock { 
-                New-ItemProperty -Path "HKCU:\Software\Microsoft\Windows\CurrentVersion\Run" -Name "Sysprep" -PropertyType "ExpandString" -Value "cmd.exe /C taskkill /IM sysprep.exe && timeout /t 5 && ""C:\Windows\system32\sysprep\sysprep.exe"" /generalize /oobe /shutdown /unattend:C:\$($SysprepFile)"
+                New-ItemProperty -Path "HKCU:\Software\Microsoft\Windows\CurrentVersion\Run" -Name "Sysprep" -PropertyType "ExpandString" -Value "cmd.exe /C taskkill /IM sysprep.exe && timeout /t 5 && ""C:\Windows\system32\sysprep\sysprep.exe"" /generalize /oobe /shutdown"
                 Restart-Computer -Force
             }
         }
