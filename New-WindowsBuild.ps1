@@ -127,7 +127,7 @@ function New-WindowsBuild {
 
     sysprepVM
 
-    while (!(Get-VM -Name $VMName).State -eq "Off") {
+    while (!((Get-VM -Name $VMName).State -eq "Off") {
         Start-Sleep -Seconds 5
     }
 
