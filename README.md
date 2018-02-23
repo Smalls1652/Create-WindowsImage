@@ -58,7 +58,9 @@ Here are two examples of how to use it:
 
 1. Create an image with no specific architecure in mind:
 
-`New-WindowsImage -VMName "Win10" -ConfigFile "Base" -Name "MaintenanceImage"`
+```powershell
+New-WindowsImage -VMName "Win10" -ConfigFile "Base" -Name "MaintenanceImage"
+```
 
 2. Create an image with a specific architecure and an answer file for sysprep:
 
