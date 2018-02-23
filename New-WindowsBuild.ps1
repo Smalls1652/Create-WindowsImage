@@ -38,9 +38,13 @@ function New-WindowsBuild {
     }
 
     function copyCoreFiles {
-        Copy-Item -ToSession $vmSession -Path ".\files\Drivers\$($Arch)" -Destination "C:\Users\Administrator\Desktop\Drivers" -Recurse
+        if ($Arch) {
+            Copy-Item -ToSession $vmSession -Path ".\files\Drivers\$($Arch)" -Destination "C:\Users\Administrator\Desktop\Drivers" -Recurse
+        }
 
-        Copy-Item -ToSession $vmSession -Path ".\PSWindowsUpdate" -Destination "C:\Users\Administrator\Desktop\PSWindowsUpdate" -Recurse
+        if (Get-ChildItem -Path ".\PSWindowsUpdate") {
+            Copy-Item -ToSession $vmSession -Path ".\PSWindowsUpdate" -Destination "C:\Users\Administrator\Desktop\PSWindowsUpdate" -Recurse
+        }
 
         Copy-Item -ToSession $vmSession -Path $SysprepFile -Destination "C:\answer.xml"
     }
@@ -95,7 +99,7 @@ function New-WindowsBuild {
 
         $driveLetter += ":\"
 
-        New-WindowsImage -CapturePath $driveLetter -ImagePath ".\output\$($ImageName).wim" -CompressionType Maximum -Name $ImageName -CheckIntegrity -Setbootable -Verify -Verbose
+        New-WindowsImage -CapturePath $driveLetter -ImagePath ".\output\$($ImageName).wim" -CompressionType Maximum -Name $ConfigFile -CheckIntegrity -Setbootable -Verify -Verbose
 
         Dismount-DiskImage -ImagePath $imageLocation.FullName
     }
@@ -120,11 +124,10 @@ function New-WindowsBuild {
     if (Get-ChildItem -Path ".\PSWindowsUpdate") {
         runWindowsUpdate
     }
+
     sysprepVM
 
-    Start-Sleep -Seconds 120
-
-    while ((Get-VM -Name $VMName).State -eq "Running") {
+    while (!(Get-VM -Name $VMName).State -eq "Off") {
         Start-Sleep -Seconds 5
     }
 
