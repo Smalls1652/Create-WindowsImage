@@ -1,4 +1,4 @@
-function New-WindowsImage {
+function New-WindowsBuild {
     <#
         .SYNOPSIS
         Automate the building of Windows images through Hyper-V with a WIM file as the output.
@@ -122,7 +122,7 @@ function New-WindowsImage {
     }
     sysprepVM
 
-    Start-Sleep -Seconds 60
+    Start-Sleep -Seconds 120
 
     while ((Get-VM -Name $VMName).State -eq "Running") {
         Start-Sleep -Seconds 5

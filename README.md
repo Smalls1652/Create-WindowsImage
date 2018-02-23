@@ -1,4 +1,4 @@
-# Automate the building of images with New-WindowsImage.
+# Automate the building of images with New-WindowsBuild.
 
 The development of this script was because of the lack of funding for SCCM licensing and no WDS/MDT infrastructure. You should be able to utilize the WIM files generated from this to use in a WDS/MDT setup, but it has not been tested yet. I personally store the WIM files on a network share and utilize WinPE to deploy an image and then clone that drive, but that's a temporary setup until I can get WDS/MDT set up.
 
@@ -45,13 +45,13 @@ Once you're done building the environment, you can now start making images. Here
 3. Run the following code (You may have to modify your execution policy):
 
 ```powershell
-Import-Module .\New-WindowsImage.ps1
+Import-Module .\New-WindowsBuild.ps1
 ```
 
-From here, you will be able to run the *New-WindowsImage* command. If you need help with the parameters, type in:
+From here, you will be able to run the *New-WindowsBuild* command. If you need help with the parameters, type in:
 
 ```powershell
-Get-Help -Full New-WindowsImage
+Get-Help -Full New-WindowsBuild
 ```
 
 Here are two examples of how to use it:
@@ -59,13 +59,13 @@ Here are two examples of how to use it:
 1. Create an image with no specific architecure in mind:
 
 ```powershell
-New-WindowsImage -VMName "Win10" -ConfigFile "Base" -Name "MaintenanceImage"
+New-WindowsBuild -VMName "Win10" -ConfigFile "Base" -Name "MaintenanceImage"
 ```
 
 2. Create an image with a specific architecure and an answer file for sysprep:
 
 ```powershell
-New-WindowsImage -VMName "Win10" -ConfigFile "Base" -Name "Employees" -Arch "Optiplex3040" -SysprepFile ".\win10.xml"
+New-WindowsBuild -VMName "Win10" -ConfigFile "Base" -Name "Employees" -Arch "Optiplex3040" -SysprepFile ".\win10.xml"
 ```
 
 ## Getting driver packages with pnputil
