@@ -12,7 +12,7 @@ function New-WindowsBuild {
         .PARAMETER ConfigFile
         The name of the ConfigFile in the Images directory. This is to determine what's needed to be installed or done to a specific image.
 
-        .PARAMETER Name
+        .PARAMETER ImageName
         This will be the name of the image once it's completed.
 
         .PARAMETER SysprepFile
@@ -26,7 +26,7 @@ function New-WindowsBuild {
     param(
         [Parameter(Mandatory = $true)][string]$VMName,
         [Parameter(Mandatory = $true)][string]$ConfigFile,
-        [Parameter(Mandatory = $true)][string]$Name,
+        [Parameter(Mandatory = $true)][string]$ImageName,
         [string]$SysprepFile,
         [string]$Arch
     )
@@ -99,7 +99,7 @@ function New-WindowsBuild {
 
         $driveLetter += ":\"
 
-        New-WindowsImage -CapturePath $driveLetter -ImagePath ".\output\$($ImageName).wim" -CompressionType Maximum -Name $ConfigFile -CheckIntegrity -Setbootable -Verify -Verbose
+        New-WindowsImage -CapturePath $driveLetter -ImagePath ".\output\$($ImageName).wim" -CompressionType Maximum -Name $ImageName -CheckIntegrity -Setbootable -Verify -Verbose
 
         Dismount-DiskImage -ImagePath $imageLocation.FullName
     }

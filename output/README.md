@@ -1,0 +1,1 @@
+# WIM files are output into this directory.
