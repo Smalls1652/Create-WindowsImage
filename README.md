@@ -1,6 +1,12 @@
 # Automate the building of images with New-WindowsBuild.
 
-The development of this script was because of the lack of funding for SCCM licensing and no WDS/MDT infrastructure. You should be able to utilize the WIM files generated from this to use in a WDS/MDT setup, but it has not been tested yet. I personally store the WIM files on a network share and utilize WinPE to deploy an image and then clone that drive, but that's a temporary setup until I can get WDS/MDT set up.
+The development of this script was because of the lack of funding for SCCM licensing and no WDS infrastructure. You should be able to utilize the WIM files generated from this to use in a WDS/MDT setup, but it has not been tested yet. I personally store the WIM files on a network share and utilize WinPE to deploy an image and then clone that drive, but that's a temporary setup until I can get WDS/MDT set up.
+
+# Why use this?
+
+This is for building WIM files of a Windows install for quick and easy deployment. This can be either through applying the image with DISM in a WinPE environment or even using it in a Windows installer. The WIM files can potentially be used in a WDS setup, but as I've said before I don't have it set up personally and I haven't tested it.
+
+There are plenty of other ways to go about this, specifically through MDT; however, I created this as an alternative. This works in almost the same way, but it's utilizing control that you supply through Powershell.
 
 ## Prereqs
 
