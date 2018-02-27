@@ -32,12 +32,18 @@ function New-WindowsBuild {
     )
 
     function revertcheckpoint {
+        #This is to clear the checkpoint from a previous run and to restore the base checkpoint.
+
         Get-VMSnapshot -VMName $VMName | Where-Object -Property "Name" -eq "Final" | Remove-VMSnapshot
 
         Get-VMSnapshot -VMName $VMName | Where-Object -Property "Name" -eq "Base Start" | Restore-VMSnapshot -Confirm:$false
     }
 
     function copyCoreFiles {
+
+        #Copying core files (If provided) for drivers, PSWindowsUpdate, and the sysprep answer file.
+        #The majority of files are copied to the Administrator's desktop because they're deleted when sysprepped.
+
         if ($Arch) {
             Copy-Item -ToSession $vmSession -Path ".\files\Drivers\$($Arch)" -Destination "C:\Users\Administrator\Desktop\Drivers" -Recurse
         }
@@ -46,10 +52,15 @@ function New-WindowsBuild {
             Copy-Item -ToSession $vmSession -Path ".\PSWindowsUpdate" -Destination "C:\Users\Administrator\Desktop\PSWindowsUpdate" -Recurse
         }
 
-        Copy-Item -ToSession $vmSession -Path $SysprepFile -Destination "C:\answer.xml"
+        if ($SysprepFile) {
+            Copy-Item -ToSession $vmSession -Path $SysprepFile -Destination "C:\answer.xml"
+        }
     }
 
     function installDrivers {
+
+        #Installs drivers if they were copied over.
+
         Invoke-Command -VMName $VMName -Credential $creds -ScriptBlock { 
 
             foreach ($file in (Get-ChildItem -Path "C:\Users\Administrator\Desktop\Drivers" -Depth 1 | Where-Object -Property "Name" -like "*.inf" )) {
@@ -61,17 +72,26 @@ function New-WindowsBuild {
 
     function runConfigCommands {
 
+        #If a config file was provided, then it runs through the config file's commands.
+
         . ".\Images\$($ConfigFile).ps1"
 
     }
 
     function runWindowsUpdate {
 
+        #If PSWindowsUpdate is provided, then it's ran. It does one pass-through of Windows Update and does not auto reboot.
+
         Invoke-Command -VMName $VMName -Credential $creds -ScriptBlock { cd "C:\Users\Administrator\Desktop\PSWindowsUpdate\"; Import-Module ".\PSWindowsUpdate.psm1" ; Get-WUInstall -AcceptAll Software -Verbose -IgnoreReboot }
 
     }
 
     function sysprepVM {
+
+        #If an answer file was provided, it uses that for the generalization process; otherwise, it's just a generic generalization. Sysprep is not done immediately as it allows any updates applied to be installed during a reboot.
+        #The step disables remote console access for accounts with blank passwords. This was enabled in the environment, but is not recommended for a production image.
+        #This step also disables the local administrator account.
+
         if ($SysprepFile) {
             Invoke-Command -VMName $VMName -Credential $creds -ScriptBlock { 
                 New-ItemProperty -Path "HKLM:\SYSTEM\CurrentControlSet\Control\Lsa" -Name "LimitBlankPasswordUse" -PropertyType "DWORD" -Value "1" -Force | Out-Null
@@ -93,6 +113,8 @@ function New-WindowsBuild {
 
     function createWIMFile {
 
+        #This step finds the path where the VM is stored at and mounts it to your computer as read-only. From there it gathers the drive letter assigned to it and creates a WIM image from it. Once finished, it dismounts the image.
+
         $vmLocation = Get-VM -Name $VMName | Select-Object -ExpandProperty "Path"
 
         $imageLocation = Get-ChildItem -Path "$($vmLocation)\Virtual Hard Disks\" | Sort-Object -Property "LastWriteTime" -Descending | Select-Object -First 1
@@ -108,15 +130,18 @@ function New-WindowsBuild {
         Dismount-DiskImage -ImagePath $imageLocation.FullName
     }
     
-    . ".\SoftwareRepo.ps1"
+    . ".\SoftwareRepo.ps1" #This is to load in the repo, which houses the functions that can be called in a config file.
 
-    $creds = New-Object System.Management.Automation.PSCredential("Administrator", (New-Object System.Security.SecureString))
+    $creds = New-Object System.Management.Automation.PSCredential("Administrator", (New-Object System.Security.SecureString)) #Creates a PSCredential object for the local Administrator account.
 
     revertcheckpoint
     Start-VM -Name $VMName
-    Start-Sleep -Seconds 120
-    $vmSession = New-PSSession -VMName "Win10" -Credential $creds
-    Invoke-Command -VMName $vmName -Credential $creds -ScriptBlock { Set-ExecutionPolicy -ExecutionPolicy Bypass -Confirm:$false }
+    Start-Sleep -Seconds 120 #Currently the script doesn't have any loop to detect if the VM is on.
+
+    $vmSession = New-PSSession -VMName "Win10" -Credential $creds #Creating a PSSession to the VM for copying files and invoking commands to it.
+
+    Invoke-Command -VMName $vmName -Credential $creds -ScriptBlock { Set-ExecutionPolicy -ExecutionPolicy Bypass -Confirm:$false } #Execution Policy is set to Bypass to allow any custom script to be loaded without issue.
+
     copyCoreFiles
 
     if ($Arch) {
@@ -131,11 +156,12 @@ function New-WindowsBuild {
 
     sysprepVM
 
+    #This the logic to determine when the VM has finished sysprepping.
     while (!((Get-VM -Name $VMName).State -eq "Off")) {
         Start-Sleep -Seconds 5
     }
 
-    Checkpoint-VM -Name $VMName -SnapshotName "Final"
+    Checkpoint-VM -Name $VMName -SnapshotName "Final" #Creating the final checkpoint to create the WIM file from.
 
     createWIMFile
 }
