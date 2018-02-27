@@ -67,20 +67,24 @@ function New-WindowsBuild {
 
     function runWindowsUpdate {
 
-        Invoke-Command -VMName $VMName -Credential $creds -ScriptBlock { cd "C:\Users\Administrator\Desktop\PSWindowsUpdate\"; Import-Module PSWindowsUpdate ; Get-WUInstall -AcceptAll Software -Verbose -IgnoreReboot }
+        Invoke-Command -VMName $VMName -Credential $creds -ScriptBlock { cd "C:\Users\Administrator\Desktop\PSWindowsUpdate\"; Import-Module ".\PSWindowsUpdate.psm1" ; Get-WUInstall -AcceptAll Software -Verbose -IgnoreReboot }
 
     }
 
     function sysprepVM {
         if ($SysprepFile) {
             Invoke-Command -VMName $VMName -Credential $creds -ScriptBlock { 
+                New-ItemProperty -Path "HKLM:\SYSTEM\CurrentControlSet\Control\Lsa" -Name "LimitBlankPasswordUse" -PropertyType "DWORD" -Value "1" -Force | Out-Null
                 New-ItemProperty -Path "HKCU:\Software\Microsoft\Windows\CurrentVersion\Run" -Name "Sysprep" -PropertyType "ExpandString" -Value "cmd.exe /C taskkill /IM sysprep.exe && timeout /t 5 && ""C:\Windows\system32\sysprep\sysprep.exe"" /generalize /oobe /shutdown /unattend:C:\answer.xml"
+                Disable-LocalUser -Name "Administrator"
                 Restart-Computer -Force
             }
         }
         else {
             Invoke-Command -VMName $VMName -Credential $creds -ScriptBlock { 
+                New-ItemProperty -Path "HKLM:\SYSTEM\CurrentControlSet\Control\Lsa" -Name "LimitBlankPasswordUse" -PropertyType "DWORD" -Value "1" -Force | Out-Null
                 New-ItemProperty -Path "HKCU:\Software\Microsoft\Windows\CurrentVersion\Run" -Name "Sysprep" -PropertyType "ExpandString" -Value "cmd.exe /C taskkill /IM sysprep.exe && timeout /t 5 && ""C:\Windows\system32\sysprep\sysprep.exe"" /generalize /oobe /shutdown"
+                Disable-LocalUser -Name "Administrator"
                 Restart-Computer -Force
             }
         }
