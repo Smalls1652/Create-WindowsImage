@@ -23,7 +23,10 @@ The development of this script was because of the lack of funding for SCCM licen
 2. **Optional** Move/copy any driver folders for a specific architecture to .\files\Drivers\ folder.
 3. **Optional** Move/copy the PSWindowsUpdate folder to the root of your environment.
 4. Create a Windows 10 VM in Hyper-V, install Windows 10 (Either Education, Enterprise, or Pro), and once Cortana starts talking press Shift + Ctrl + F3. It will reboot to Audit mode. **(If you plan on doing Windows Updates or software that requires a network connection to download, create an external switch in Hyper-V and assign it to the VM)**
-5. Once it gets to the desktop (A sysprep window should be open when you get to the desktop), create a snapshot called "Base Start".
+5. Once it gets to the desktop (A sysprep window should be open when you get to the desktop).
+6. Enable the local Administrator account.
+7. Open gpedit.msc and navigate to Computer Configuration -> Windows Settings -> Security Settings -> Local Policies -> Security Options. Disable the **Accounts: Limit local account use of blank passwords to console logon only**. (This will be reverted at the very end of the script.)
+8. Create a checkpoint called "Base Start".
 6. Either shut down the VM or leave it running.
 
 ### Software Repo and Config Files
